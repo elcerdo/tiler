@@ -5,7 +5,7 @@
 #include <QBrush>
 #include <cmath>
 
-QPoint quantizePoint(const QPointF &point)
+QPoint SelectionItem::quantizePoint(const QPointF &point)
 {
     const int x = round(point.x()/24);
     const int y = round(point.y()/24);
@@ -40,6 +40,7 @@ void SelectionItem::handleTranslation(const QPointF &position)
     const QPoint translation = quantizePoint(position);
     if (translation.isNull()) return;
     qDebug() << "moving selection" << pos() << translation;
+    emit movedFrom(QPoint(std::floor(pos().x()/24),std::floor(pos().y()/24)));
     moveBy(translation.x()*24,translation.y()*24);
     //setPos(selection_position);
 }
