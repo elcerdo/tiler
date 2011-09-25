@@ -7,23 +7,17 @@
 TileWidget::TileWidget(QWidget* parent)
     : QGraphicsView(parent), scene(NULL)
 {
+    selection = new SelectionItem(this);
+
     scene = new QGraphicsScene(this);
-    {
-	static QPen pen;
-	pen.setColor(Qt::black);
-	pen.setWidthF(2);
+    scene->addItem(selection);
 
-	static QBrush brush;
-	brush.setColor(Qt::yellow);
-	brush.setStyle(Qt::Dense5Pattern);
-
-	QGraphicsRectItem* selection = scene->addRect(0,0,24,24);
-	selection->setPen(pen);
-	selection->setBrush(brush);
-    }
-
+    setDragMode(QGraphicsView::NoDrag);
     setScene(scene);
-    fitInView(QRectF(0,0,240,240),Qt::KeepAspectRatioByExpanding);
+
+    setSceneRect(QRectF(0,0,24,24));
+    scale(2,2);
+    //fitInView(QRectF(0,0,240,240),Qt::KeepAspectRatioByExpanding);
 }
 
 void TileWidget::drawBackground(QPainter* painter,const QRectF& clipping)
@@ -35,15 +29,36 @@ void TileWidget::drawBackground(QPainter* painter,const QRectF& clipping)
     const int imax = std::ceil(clipping.right()/24);
     const int jmax = std::ceil(clipping.bottom()/24);
     //qDebug() << imin << imax << jmin << jmax;
+    qDebug() << sceneRect();
+
 
     painter->save();
-
-    for (int ii=imin; ii<imax; ii++)
-	painter->drawLine(QPointF(ii*24,clipping.top()),QPointF(ii*24,clipping.bottom()));
-    for (int jj=jmin; jj<imax; jj++)
-	painter->drawLine(QPointF(clipping.left(),jj*24),QPointF(clipping.right(),jj*24));
-
-    painter->drawRect(clipping);
+    painter->setPen(QPen(Qt::blue,0.5));
+    painter->setBrush(QBrush(painter->pen().color()));
+    painter->translate(imin*24,0);
+    for (int ii=imin; ii<imax; ii++) {
+	painter->save();
+	if (ii%5==0) painter->setPen(QPen(painter->pen().color(),painter->pen().widthF()*2));
+	painter->drawLine(QPointF(0,clipping.top()),QPointF(0,clipping.bottom()));
+	painter->restore();
+	painter->drawText(2,10,QString("%1").arg(ii));
+	painter->translate(24,0);
+    }
     painter->restore();
+
+    painter->save();
+    painter->setPen(QPen(Qt::red,0.5));
+    painter->setBrush(QBrush(painter->pen().color()));
+    painter->translate(0,jmin*24);
+    for (int jj=jmin; jj<jmax; jj++) {
+	painter->save();
+	if (jj%5==0) painter->setPen(QPen(painter->pen().color(),painter->pen().widthF()*2));
+	painter->drawLine(QPointF(clipping.left(),0),QPointF(clipping.right(),0));
+	painter->restore();
+	painter->drawText(2,10,QString("%1").arg(jj));
+	painter->translate(0,24);
+    }
+    painter->restore();
+
 }
 

@@ -3,6 +3,7 @@
 
 #include <QGraphicsScene>
 #include <QGraphicsView>
+#include "selectionitem.h"
 
 class TileWidget : public QGraphicsView {
     Q_OBJECT
@@ -11,6 +12,7 @@ class TileWidget : public QGraphicsView {
     protected:
 	void drawBackground(QPainter* painter,const QRectF& clipping);
 	QGraphicsScene* scene;
+	SelectionItem* selection;
 };
 
 #endif
